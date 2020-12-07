@@ -25,6 +25,17 @@ app.get('/api/movies', (req, res) => {
   });
 });
 
+app.get('/api/users', (req, res) => {
+  let sql = 'SELECT * FROM user';
+
+  con.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).send('Error retrieving data');
+    }
+    res.status(200).json(results);
+  });
+});
+
 // GET ONE
 app.get('/api/movies/:id', (req, res) => {
   const { id } = req.params;
@@ -86,6 +97,39 @@ app.post('/api/users', (req, res) => {
       res.status(200).send('Successfully saved');
     }
   });
+});
+
+// PUT
+app.put('/api/users/:id', (req, res) => {
+  const idUser = req.params.id;
+  const newUser = req.body;
+
+  con.query(
+    'UPDATE user SET ? WHERE id = ?',
+    [newUser, idUser],
+    (err, results) => {
+      if (err) {
+        res.status(500).send('Error updating a user');
+      }
+      res.status(200).send('User updated successfully 🎉');
+    }
+  );
+});
+
+app.put('/api/movies/:id', (req, res) => {
+  const { id } = req.params;
+  const newMovie = req.body;
+
+  con.query(
+    'UPDATE movies SET ? WHERE id = ?',
+    [newMovie, id],
+    (err, results) => {
+      if (err) {
+        res.status(500).send('Error updating a user');
+      }
+      res.status(200).send('User updated successfully 🎉');
+    }
+  );
 });
 
 app.listen(port, (err) => {
