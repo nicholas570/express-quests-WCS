@@ -1,12 +1,19 @@
 const express = require('express');
 const app = express();
 const con = require('./database/conf');
-const port = 4000;
+const port = process.env.PORT || 4000;
 
-app.get('/', (req, res) => {
-  res.send('Welcome to my favourite movie list');
-});
+// MIDDLEWARES
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
+// GET
+
+// GET ALL
 app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
 
@@ -18,6 +25,7 @@ app.get('/api/movies', (req, res) => {
   });
 });
 
+// GET ONE
 app.get('/api/movies/:id', (req, res) => {
   const { id } = req.params;
   let sql = 'SELECT * from movies WHERE id=?';
@@ -31,6 +39,7 @@ app.get('/api/movies/:id', (req, res) => {
   });
 });
 
+//GET WITH QUERY
 app.get('/api/search', (req, res) => {
   const { maxDuration } = req.query;
   let sql = 'SELECT * from movies WHERE duration <= ?';
@@ -46,14 +55,43 @@ app.get('/api/search', (req, res) => {
   });
 });
 
-app.get('/api/users', (req, res) => {
-  res.status(401).send('Unauthorized');
+// POST
+
+// MOVIES
+app.post('/api/movies', (req, res) => {
+  const { title, director, year, color, duration } = req.body;
+  let sql =
+    'INSERT INTO movies(title, director, year, color, duration) VALUES(?, ?, ?, ?, ?)';
+
+  con.query(sql, [title, director, year, color, duration], (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Error saving a movie');
+    } else {
+      res.status(200).send('Successfully saved');
+    }
+  });
 });
 
-app.listen(process.env.PORT || port, (err) => {
+//USERS
+app.post('/api/users', (req, res) => {
+  const data = req.body;
+  let sql = 'INSERT INTO user SET ?';
+
+  con.query(sql, data, (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Error saving a user');
+    } else {
+      res.status(200).send('Successfully saved');
+    }
+  });
+});
+
+app.listen(port, (err) => {
   if (err) {
     throw new Error(err);
   } else {
-    console.log(`server listening on port ${process.env.PORT}`);
+    console.log(`server listening on port ${port}`);
   }
 });
