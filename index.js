@@ -3,6 +3,16 @@ const app = express();
 const con = require('./database/conf');
 const port = process.env.PORT || 4000;
 
+// MIDDLEWARES
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+// GET
+
 // GET ALL
 app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
@@ -42,6 +52,39 @@ app.get('/api/search', (req, res) => {
       });
     }
     res.status(200).json(results);
+  });
+});
+
+// POST
+
+// MOVIES
+app.post('/api/movies', (req, res) => {
+  const { title, director, year, color, duration } = req.body;
+  let sql =
+    'INSERT INTO movies(title, director, year, color, duration) VALUES(?, ?, ?, ?, ?)';
+
+  con.query(sql, [title, director, year, color, duration], (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Error saving a movie');
+    } else {
+      res.status(200).send('Successfully saved');
+    }
+  });
+});
+
+//USERS
+app.post('/api/users', (req, res) => {
+  const data = req.body;
+  let sql = 'INSERT INTO user SET ?';
+
+  con.query(sql, data, (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Error saving a user');
+    } else {
+      res.status(200).send('Successfully saved');
+    }
   });
 });
 
