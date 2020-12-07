@@ -132,6 +132,34 @@ app.put('/api/movies/:id', (req, res) => {
   );
 });
 
+// DELETE
+
+app.delete('/api/users/:id', (req, res) => {
+  const idUser = req.params.id;
+
+  con.query('DELETE FROM user WHERE id = ?', [idUser], (err, results) => {
+    if (err) {
+      res.status(500).send('😱 Error deleting an user');
+    } else {
+      res.status(200).send('🎉 User deleted!');
+    }
+  });
+});
+
+app.delete('/api/movies/:id', (req, res) => {
+  const idMovie = req.params.id;
+  let sql = 'DELETE FROM movies WHERE id = ?';
+
+  con.query(sql, [idMovie], (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Erreu lors da la suppression du film');
+    } else {
+      res.sendStatus(200);
+    }
+  });
+});
+
 app.listen(port, (err) => {
   if (err) {
     throw new Error(err);
