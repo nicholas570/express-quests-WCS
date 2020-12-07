@@ -3,6 +3,7 @@ const app = express();
 const con = require('./database/conf');
 const port = process.env.PORT || 4000;
 
+// GET ALL
 app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
 
@@ -14,6 +15,7 @@ app.get('/api/movies', (req, res) => {
   });
 });
 
+// GET ONE
 app.get('/api/movies/:id', (req, res) => {
   const { id } = req.params;
   let sql = 'SELECT * from movies WHERE id=?';
@@ -27,6 +29,7 @@ app.get('/api/movies/:id', (req, res) => {
   });
 });
 
+//GET WITH QUERY
 app.get('/api/search', (req, res) => {
   const { maxDuration } = req.query;
   let sql = 'SELECT * from movies WHERE duration <= ?';
