@@ -16,8 +16,14 @@ app.use(
 // GET ALL
 app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
+  let sqlValues = [];
 
-  con.query(sql, (err, results) => {
+  if (req.query.color) {
+    sql += ' WHERE color = 1';
+    sqlValues.push(req.query.color);
+  }
+
+  con.query(sql, sqlValues, (err, results) => {
     if (err) {
       res.status(500).send('Error retrieving data');
     }
@@ -44,9 +50,12 @@ app.get('/api/movies/:id', (req, res) => {
   con.query(sql, [id], (err, results) => {
     if (err) {
       res.status(500).send('Error retrieving data');
-    } else {
-      res.status(200).json(results);
     }
+    if (results.length === 0) {
+      return res.status(404).send('Movie not found');
+    }
+
+    res.status(200).json(results);
   });
 });
 
