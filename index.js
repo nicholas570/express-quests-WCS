@@ -6,42 +6,34 @@ const port = process.env.PORT || 4000;
 // GET ALL
 app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
+  let sqlValues = [];
 
-  con.query(sql, (err, results) => {
+  if (req.query.rating) {
+    sql += 'WHERE rating = ?';
+    sqlValues.push(req.query.rating);
+  }
+
+  con.query(sql, sqlValues, (err, results) => {
     if (err) {
-      res.status(500).send('Error retrieving data');
+      res.json({ success: false, message: 'Error retrieving data' });
     }
-    res.status(200).json(results);
+    res.status(200).json({ success: true, data: results });
   });
 });
 
 // GET ONE
 app.get('/api/movies/:id', (req, res) => {
   const { id } = req.params;
-  let sql = 'SELECT * from movies WHERE id=?';
+  const sql = 'SELECT * from movies WHERE id=?';
 
   con.query(sql, [id], (err, results) => {
     if (err) {
-      res.status(500).send('Error retrieving data');
-    } else {
-      res.status(200).json(results);
+      res.json({ success: false, message: 'Error retrieving data' });
     }
-  });
-});
-
-//GET WITH QUERY
-app.get('/api/search', (req, res) => {
-  const { maxDuration } = req.query;
-  let sql = 'SELECT * from movies WHERE duration <= ?';
-
-  con.query(sql, [maxDuration], (err, results) => {
-    if (err) {
-      res.status(200).json({
-        movies: moviezz,
-        message: 'no movies found for this duration',
-      });
+    if (results.length === 0) {
+      res.status(404).json({ success: false, message: 'Movie not found' });
     }
-    res.status(200).json(results);
+    res.status(200).json({ success: true, data: results });
   });
 });
 
