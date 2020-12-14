@@ -8,9 +8,15 @@ app.get('/api/movies', (req, res) => {
   let sql = 'SELECT * FROM movies';
   let sqlValues = [];
 
-  if (req.query.rating) {
-    sql += 'WHERE rating = ?';
+  if (req.query.rating && req.query.genre) {
+    sql += ' WHERE rating = ? && genre = ?';
+    sqlValues.push(req.query.rating, req.query.genre);
+  } else if (req.query.rating) {
+    sql += ' WHERE rating = ?';
     sqlValues.push(req.query.rating);
+  } else if (req.query.genre) {
+    sql += ' WHERE genre = ?';
+    sqlValues.push(req.query.genre);
   }
 
   con.query(sql, sqlValues, (err, results) => {
